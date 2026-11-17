@@ -124,16 +124,13 @@ tr:hover td{background:rgba(230,196,122,.06)}
     <div class="divider">❦</div>
   </header>
 
-  <!-- КНОПКИ СОХРАНЕНИЯ И ССЫЛКИ -->
-  <div class="card" style="padding: 20px;">
-    <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:center;">
-      <div style="flex:1; min-width:200px; color:var(--gold2); font-size:13px; text-align:center;">Данные сохраняются автоматически на этом устройстве.</div>
-      <button type="button" id="btnShare" class="btn-link" style="background:linear-gradient(135deg, var(--rose) 0%, #b8758a 100%); color:#fff; border:none; box-shadow:0 6px 20px rgba(224,168,184,.35);">🔗 Сделать ссылку для друзей</button>
-    </div>
-    <div id="shareResult" class="hint" style="display:none; margin-top:10px; word-break:break-all;"></div>
+  <!-- НОВАЯ ПАНЕЛЬ СОХРАНЕНИЯ -->
+  <div class="card" style="padding: 20px; text-align: center;">
+    <button type="button" id="btnSaveLink" class="btn-gold" style="max-width: 400px; margin: 0 auto; font-size: 16px;">💾 Сохранить и получить ссылку</button>
+    <div id="linkResult" class="hint" style="display:none; margin-top:15px; word-break:break-all; text-align:left;"></div>
+    <div class="hint" style="margin-top:10px;">Нажмите кнопку, скопируйте ссылку и отправьте другу. Вся рассадка сохранится в ссылке.</div>
   </div>
 
-  <!-- ДОБАВИТЬ ГОСТЯ -->
   <div class="card">
     <h2><span class="icon">👥</span> Добавить гостя</h2>
     <div class="grid">
@@ -215,30 +212,25 @@ tr:hover td{background:rgba(230,196,122,.06)}
       </select>
     </div>
     <button type="button" id="btnAdd" class="btn-gold">➕ Добавить гостя</button>
-    <div class="hint">Можно нажать <b>Enter</b> в поле имени. Данные сохраняются автоматически.</div>
+    <div class="hint">Можно нажать <b>Enter</b> в поле имени.</div>
   </div>
 
-  <!-- ПОСАДИТЬ ВМЕСТЕ -->
   <div class="card">
     <h2><span class="icon">🤝</span> Посадить вместе (пары и семьи)</h2>
     <div class="grp-builder">
       <h3>Создать группу «сидят вместе»</h3>
       <div class="grp-hint">Отметьте галочками <b>всех</b>, кто должен сидеть за одним столом. Например: Соня + Дима + их ребёнок.</div>
-
       <div class="grp-selector" id="guestSelector">
         <div class="grp-hint">Сначала добавьте гостей выше</div>
       </div>
-
       <div class="grp-actions">
         <input type="text" id="groupName" class="grp-name-input" placeholder="Название группы (например: Семья Ивановых)">
         <button type="button" id="btnCreateGroup" class="btn-link">💍 Создать группу</button>
       </div>
-
       <div class="grp-list" id="groupsList"></div>
     </div>
   </div>
 
-  <!-- СПИСОК ГОСТЕЙ -->
   <div class="card">
     <h2><span class="icon">📋</span> Список гостей</h2>
     <div class="stats" id="stats"></div>
@@ -253,7 +245,6 @@ tr:hover td{background:rgba(230,196,122,.06)}
     <button type="button" id="btnSeat" class="btn-gold" style="margin-top:20px">🎯 Распределить по 5 столам</button>
   </div>
 
-  <!-- ПЛАН -->
   <div class="card">
     <h2><span class="icon">🏛️</span> План зала</h2>
     <div class="hall" id="hall">
@@ -261,7 +252,6 @@ tr:hover td{background:rgba(230,196,122,.06)}
     </div>
   </div>
 
-  <!-- НАПИТКИ -->
   <div class="card">
     <h2><span class="icon">🍾</span> Расчёт напитков</h2>
     <button type="button" id="btnCalc" class="btn-gold">🍷 Рассчитать напитки</button>
@@ -282,71 +272,58 @@ tr:hover td{background:rgba(230,196,122,.06)}
 
   function $(id) { return document.getElementById(id); }
 
-  // --- СОХРАНЕНИЕ И ЗАГРУЗКА ---
-  function saveData() {
-    try {
-      localStorage.setItem("wedding_data", JSON.stringify({ guests: guests, groups: groups }));
-    } catch(e) {}
-  }
-
-  function loadData() {
-    try {
-      var data = localStorage.getItem("wedding_data");
-      if (data) {
-        var parsed = JSON.parse(data);
-        guests = parsed.guests || [];
-        groups = parsed.groups || [];
-      }
-    } catch(e) {}
-  }
-
-  function generateShareLink() {
+  // --- ФУНКЦИЯ СОЗДАНИЯ ССЫЛКИ ---
+  function generateLink() {
+    if (guests.length === 0) { alert("Сначала добавьте гостей!"); return; }
+    
+    // Упаковываем данные в JSON и кодируем в Base64
     var dataStr = JSON.stringify({ guests: guests, groups: groups });
-    var encoded = btoa(encodeURIComponent(dataStr)); // кодируем в base64
+    var encoded = btoa(encodeURIComponent(dataStr));
     var url = window.location.origin + window.location.pathname + "?data=" + encoded;
     
-    var resDiv = $("shareResult");
-    resDiv.style.display = "block";
-    resDiv.innerHTML = '<b>Ссылка готова!</b> Скопируйте и отправьте её другу. Он увидит вашу рассадку:<br><br>' +
-      '<input type="text" value="' + url + '" readonly style="width:100%; padding:10px; font-size:12px; background:#1a1216; color:#f5dda0; border:1px solid #e6c47a;" onclick="this.select()">' +
-      '<div style="margin-top:8px; font-size:11px; color:#b09a82;">⚠️ Друг увидит данные только когда откроет ссылку. Это режим просмотра.</div>';
+    var res = $("linkResult");
+    res.style.display = "block";
+    res.innerHTML = '<b>Ваша ссылка готова!</b> Скопируйте её и отправьте другу. Он увидит всю вашу рассадку:<br><br>' +
+      '<input type="text" value="' + url + '" readonly style="width:100%; padding:10px; font-size:12px; background:#1a1216; color:#f5dda0; border:1px solid #e6c47a; border-radius:6px;" onclick="this.select()">';
+    
+    // Пытаемся скопировать в буфер
+    var temp = document.createElement('textarea');
+    temp.value = url;
+    document.body.appendChild(temp);
+    temp.select();
+    try { document.execCommand('copy'); alert("Ссылка скопирована в буфер обмена!"); } 
+    catch(e) { alert("Выделите ссылку и нажмите Ctrl+C"); }
+    document.body.removeChild(temp);
   }
 
+  // --- ЗАГРУЗКА ИЗ ССЫЛКИ ---
   function loadFromUrl() {
     var urlParams = new URLSearchParams(window.location.search);
     var dataParam = urlParams.get('data');
     if (dataParam) {
       try {
-        var decoded = decodeURIComponent(atob(dataParam));
-        var parsed = JSON.parse(decoded);
-        if (parsed.guests) {
-          guests = parsed.guests;
-          groups = parsed.groups || [];
-          alert("Загружена рассадка по ссылке! Вы можете её редактировать.");
+        var decoded = JSON.parse(decodeURIComponent(atob(dataParam)));
+        if (decoded.guests) {
+          guests = decoded.guests;
+          groups = decoded.groups || [];
+          refreshAll();
         }
-      } catch(e) { console.error("Ошибка загрузки по ссылке", e); }
-    } else {
-      loadData();
+      } catch(e) { 
+        console.error("Ошибка загрузки данных из ссылки", e); 
+        alert("Не удалось загрузить данные из ссылки. Возможно, она повреждена.");
+      }
     }
   }
 
-  // --- ЛОГИКА ---
   function addGuest() {
     var name = $("gName").value.trim();
     if (!name) { $("gName").focus(); return; }
-
     guests.push({
-      name: name,
-      role: $("gRole").value || "Гость",
-      side: $("gSide").value,
-      drink: $("gDrink").value,
-      soft: $("gSoft").value,
-      company: $("gCompany").value
+      name: name, role: $("gRole").value || "Гость", side: $("gSide").value,
+      drink: $("gDrink").value, soft: $("gSoft").value, company: $("gCompany").value
     });
-
     $("gName").value = "";
     $("gName").focus();
-    saveData();
     refreshAll();
   }
 
@@ -358,7 +335,6 @@ tr:hover td{background:rgba(230,196,122,.06)}
       if (groups[gi].members.length < 2) groups.splice(gi, 1);
     }
     delete selectedForGroup[name];
-    saveData();
     refreshAll();
   }
 
@@ -371,44 +347,30 @@ tr:hover td{background:rgba(230,196,122,.06)}
   function createGroup() {
     var members = [];
     for (var k in selectedForGroup) members.push(k);
-    if (members.length < 2) { alert("Выберите хотя бы 2 гостей для группы"); return; }
-
+    if (members.length < 2) { alert("Выберите хотя бы 2 гостей"); return; }
     for (var gi = 0; gi < groups.length; gi++) {
       for (var m = 0; m < members.length; m++) {
         if (groups[gi].members.indexOf(members[m]) !== -1) {
-          alert("Гость «" + members[m] + "» уже в группе «" + groups[gi].name + "».");
-          return;
+          alert("Гость «" + members[m] + "» уже в группе «" + groups[gi].name + "»."); return;
         }
       }
     }
-
     var groupName = $("groupName").value.trim() || members.join(" + ");
     groups.push({ name: groupName, members: members });
-    
     selectedForGroup = {};
     $("groupName").value = "";
-    saveData();
     refreshAll();
   }
 
-  function removeGroup(i) {
-    groups.splice(i, 1);
-    saveData();
-    refreshAll();
-  }
+  function removeGroup(i) { groups.splice(i, 1); refreshAll(); }
 
   function getGroupForGuest(name) {
-    for (var i = 0; i < groups.length; i++) {
-      if (groups[i].members.indexOf(name) !== -1) return groups[i];
-    }
+    for (var i = 0; i < groups.length; i++) if (groups[i].members.indexOf(name) !== -1) return groups[i];
     return null;
   }
 
   function refreshAll() {
-    renderGuestSelector();
-    renderGuests();
-    renderGroups();
-    renderStats();
+    renderGuestSelector(); renderGuests(); renderGroups(); renderStats();
   }
 
   function renderGuestSelector() {
@@ -417,13 +379,8 @@ tr:hover td{background:rgba(230,196,122,.06)}
     if (guests.length === 0) { div.innerHTML = '<div class="grp-hint">Сначала добавьте гостей выше</div>'; return; }
     var html = "";
     for (var i = 0; i < guests.length; i++) {
-      var g = guests[i];
-      var inGroup = getGroupForGuest(g.name);
-      var selected = selectedForGroup[g.name] ? " selected" : "";
-      var disabled = inGroup ? ' style="opacity:.5;cursor:not-allowed"' : "";
-      html += '<div class="guest-opt' + selected + '" data-name="' + esc(g.name) + '"' + disabled + '>' +
-        (selected ? "✓ " : "") + esc(g.name) +
-        (inGroup ? ' <span style="font-size:10px;color:#b09a82">(' + esc(inGroup.name) + ')</span>' : '') + '</div>';
+      var g = guests[i], inGroup = getGroupForGuest(g.name), selected = selectedForGroup[g.name] ? " selected" : "", disabled = inGroup ? ' style="opacity:.5;cursor:not-allowed"' : "";
+      html += '<div class="guest-opt' + selected + '" data-name="' + esc(g.name) + '"' + disabled + '>' + (selected ? "✓ " : "") + esc(g.name) + (inGroup ? ' <span style="font-size:10px;color:#b09a82">(' + esc(inGroup.name) + ')</span>' : '') + '</div>';
     }
     div.innerHTML = html;
     var opts = div.querySelectorAll(".guest-opt");
@@ -440,12 +397,10 @@ tr:hover td{background:rgba(230,196,122,.06)}
     var tbody = document.querySelector("#guestTable tbody");
     if (!tbody) return;
     var html = "";
-    if (guests.length === 0) {
-      html = '<tr><td colspan="7" style="text-align:center;color:#b09a82;padding:30px">Пока нет гостей</td></tr>';
-    } else {
+    if (guests.length === 0) html = '<tr><td colspan="7" style="text-align:center;color:#b09a82;padding:30px">Пока нет гостей</td></tr>';
+    else {
       for (var i = 0; i < guests.length; i++) {
-        var g = guests[i];
-        var grp = getGroupForGuest(g.name);
+        var g = guests[i], grp = getGroupForGuest(g.name);
         var grpHtml = grp ? '<span style="color:#f5dda0;font-size:12px">💍 ' + esc(grp.name) + '</span>' : '<span style="color:#b09a82;font-size:12px">' + companyNames[g.company] + '</span>';
         html += "<tr><td><b>" + esc(g.name) + "</b></td><td>" + esc(g.role) + "</td>" +
           '<td><span class="side-tag side-' + g.side + '">' + sideNames[g.side] + "</span></td>" +
@@ -455,9 +410,7 @@ tr:hover td{background:rgba(230,196,122,.06)}
     }
     tbody.innerHTML = html;
     var dels = tbody.querySelectorAll("[data-del]");
-    for (var j = 0; j < dels.length; j++) {
-      dels[j].addEventListener("click", function() { removeGuest(parseInt(this.getAttribute("data-del"))); });
-    }
+    for (var j = 0; j < dels.length; j++) dels[j].addEventListener("click", function() { removeGuest(parseInt(this.getAttribute("data-del"))); });
   }
 
   function renderGroups() {
@@ -467,15 +420,11 @@ tr:hover td{background:rgba(230,196,122,.06)}
     var html = "";
     for (var i = 0; i < groups.length; i++) {
       var g = groups[i];
-      html += '<span class="grp-chip"><span class="icon">' + (g.members.length > 2 ? "👨‍👩‍👧" : "💑") + '</span> ' +
-        esc(g.name) + ' <span style="font-size:11px;opacity:.8">(' + g.members.length + ')</span>' +
-        ' <span class="x" data-group="' + i + '">✖</span></span>';
+      html += '<span class="grp-chip"><span class="icon">' + (g.members.length > 2 ? "👨‍👩‍👧" : "💑") + '</span> ' + esc(g.name) + ' <span style="font-size:11px;opacity:.8">(' + g.members.length + ')</span> <span class="x" data-group="' + i + '">✖</span></span>';
     }
     div.innerHTML = html;
     var xs = div.querySelectorAll("[data-group]");
-    for (var j = 0; j < xs.length; j++) {
-      xs[j].addEventListener("click", function() { removeGroup(parseInt(this.getAttribute("data-group"))); });
-    }
+    for (var j = 0; j < xs.length; j++) xs[j].addEventListener("click", function() { removeGroup(parseInt(this.getAttribute("data-group"))); });
   }
 
   function renderStats() {
@@ -486,16 +435,9 @@ tr:hover td{background:rgba(230,196,122,.06)}
     for (var i = 0; i < guests.length; i++) {
       var g = guests[i];
       if (g.side === "bride") bride++; else groom++;
-      if (g.drink === "none") nodrink++;
-      else if (g.drink === "unknown") unknown++;
-      else drink++;
+      if (g.drink === "none") nodrink++; else if (g.drink === "unknown") unknown++; else drink++;
     }
-    div.innerHTML = '<div class="stat"><div class="num">' + guests.length + '</div><div class="lbl">Всего</div></div>' +
-      '<div class="stat"><div class="num">' + bride + '</div><div class="lbl">Невесты</div></div>' +
-      '<div class="stat"><div class="num">' + groom + '</div><div class="lbl">Жениха</div></div>' +
-      '<div class="stat"><div class="num">' + drink + '</div><div class="lbl">Пьют</div></div>' +
-      '<div class="stat"><div class="num">' + nodrink + '</div><div class="lbl">Не пьют</div></div>' +
-      '<div class="stat"><div class="num">' + unknown + '</div><div class="lbl">Не знаю</div></div>';
+    div.innerHTML = '<div class="stat"><div class="num">' + guests.length + '</div><div class="lbl">Всего</div></div><div class="stat"><div class="num">' + bride + '</div><div class="lbl">Невесты</div></div><div class="stat"><div class="num">' + groom + '</div><div class="lbl">Жениха</div></div><div class="stat"><div class="num">' + drink + '</div><div class="lbl">Пьют</div></div><div class="stat"><div class="num">' + nodrink + '</div><div class="lbl">Не пьют</div></div><div class="stat"><div class="num">' + unknown + '</div><div class="lbl">Не знаю</div></div>';
   }
 
   function getSeatingUnits() {
@@ -508,9 +450,7 @@ tr:hover td{background:rgba(230,196,122,.06)}
       }
       if (members.length > 0) units.push({ name: grp.name, guests: members, isGroup: true });
     }
-    for (var i = 0; i < guests.length; i++) {
-      if (!inGroup[guests[i].name]) units.push({ name: guests[i].name, guests: [guests[i]], isGroup: false });
-    }
+    for (var i = 0; i < guests.length; i++) if (!inGroup[guests[i].name]) units.push({ name: guests[i].name, guests: [guests[i]], isGroup: false });
     return units;
   }
 
@@ -524,15 +464,12 @@ tr:hover td{background:rgba(230,196,122,.06)}
     var units = getSeatingUnits();
     units.sort(function(a, b) { return b.guests.length - a.guests.length; });
     var tables = [[], [], [], [], []], sizes = [0, 0, 0, 0, 0];
-
     for (var i = 0; i < units.length; i++) {
       var u = units[i], best = 0, bestScore = -9999;
       for (var t = 0; t < 5; t++) {
         if (sizes[t] + u.guests.length > 12) continue;
         var score = 0;
-        for (var k = 0; k < tables[t].length; k++)
-          for (var m = 0; m < u.guests.length; m++)
-            if (tables[t][k].side === u.guests[m].side) score += 1;
+        for (var k = 0; k < tables[t].length; k++) for (var m = 0; m < u.guests.length; m++) if (tables[t][k].side === u.guests[m].side) score += 1;
         score -= sizes[t] * 0.5;
         if (score > bestScore) { bestScore = score; best = t; }
       }
@@ -550,8 +487,7 @@ tr:hover td{background:rgba(230,196,122,.06)}
     for (var i = 0; i < 5; i++) {
       var t = tables[i], names = [];
       for (var j = 0; j < t.length; j++) names.push(esc(t[j].name));
-      html += '<div class="rtable"><div class="num">' + (i + 1) + '</div><div class="seats">' + t.length + ' чел.</div>' +
-        '<div class="list">' + (names.join(", ") || "пусто") + '</div></div>';
+      html += '<div class="rtable"><div class="num">' + (i + 1) + '</div><div class="seats">' + t.length + ' чел.</div><div class="list">' + (names.join(", ") || "пусто") + '</div></div>';
     }
     html += '<div class="couple-wrap"><div class="couple"><div class="lbl">Стол №6</div><div class="names">💕 Невеста & Жених</div></div></div></div>';
     hall.innerHTML = html;
@@ -561,38 +497,25 @@ tr:hover td{background:rgba(230,196,122,.06)}
     var box = $("tablesResult"), html = "";
     for (var i = 0; i < 5; i++) {
       var t = tables[i], chips = "";
-      for (var j = 0; j < t.length; j++) {
-        chips += '<span class="chip">' + esc(t[j].name) + '<span class="r">' + esc(t[j].role) + " · " + sideNames[t[j].side] + "</span></span>";
-      }
+      for (var j = 0; j < t.length; j++) chips += '<span class="chip">' + esc(t[j].name) + '<span class="r">' + esc(t[j].role) + " · " + sideNames[t[j].side] + "</span></span>";
       html += '<div class="tbox"><h3>Стол №' + (i + 1) + ' <span class="cnt">' + t.length + " чел.</span></h3>" + chips + "</div>";
     }
-    html += '<div class="tbox couple-box"><h3>💕 Стол №6 — для вас с женихом <span class="cnt">2 чел.</span></h3>' +
-      '<span class="chip">Невеста<span class="r">Молодожёны</span></span><span class="chip">Жених<span class="r">Молодожёны</span></span></div>';
+    html += '<div class="tbox couple-box"><h3>💕 Стол №6 — для вас с женихом <span class="cnt">2 чел.</span></h3><span class="chip">Невеста<span class="r">Молодожёны</span></span><span class="chip">Жених<span class="r">Молодожёны</span></span></div>';
     box.innerHTML = html;
   }
 
   function calc() {
     var box = $("alcoholResult");
     if (guests.length === 0) { box.innerHTML = '<div class="empty" style="padding:30px"><span class="big">🍷</span>Сначала добавьте гостей</div>'; return; }
-    var counts = { all: 0, unknown: 0, vodka: 0, wine: 0, champagne: 0, none: 0 };
-    var softCounts = { all: 0, unknown: 0, water: 0, juice: 0, soda: 0, tea: 0, mors: 0, lemonade: 0, compote: 0 };
-    for (var i = 0; i < guests.length; i++) {
-      counts[guests[i].drink] = (counts[guests[i].drink] || 0) + 1;
-      softCounts[guests[i].soft] = (softCounts[guests[i].soft] || 0) + 1;
-    }
-    var vodkaL = (counts.vodka * 0.25 + counts.all * 0.15).toFixed(1);
-    var wineL = (counts.wine * 0.35 + counts.all * 0.20).toFixed(1);
-    var champL = (counts.champagne * 0.20 + counts.all * 0.10).toFixed(1);
-    var waterL = (guests.length * 0.5).toFixed(1);
-    var juiceL = (guests.length * 0.3).toFixed(1);
-    var sodaL = (guests.length * 0.2).toFixed(1);
-
+    var counts = { all: 0, unknown: 0, vodka: 0, wine: 0, champagne: 0, none: 0 }, softCounts = { all: 0, unknown: 0, water: 0, juice: 0, soda: 0, tea: 0, mors: 0, lemonade: 0, compote: 0 };
+    for (var i = 0; i < guests.length; i++) { counts[guests[i].drink] = (counts[guests[i].drink] || 0) + 1; softCounts[guests[i].soft] = (softCounts[guests[i].soft] || 0) + 1; }
+    var vodkaL = (counts.vodka * 0.25 + counts.all * 0.15).toFixed(1), wineL = (counts.wine * 0.35 + counts.all * 0.20).toFixed(1), champL = (counts.champagne * 0.20 + counts.all * 0.10).toFixed(1);
+    var waterL = (guests.length * 0.5).toFixed(1), juiceL = (guests.length * 0.3).toFixed(1), sodaL = (guests.length * 0.2).toFixed(1);
     var alcHtml = "";
     if (counts.vodka + counts.all > 0) alcHtml += '<span class="badge">🥃 <b>Крепкое</b> · ~' + vodkaL + " л</span>";
     if (counts.wine + counts.all > 0) alcHtml += '<span class="badge">🍷 <b>Вино</b> · ~' + wineL + " л</span>";
     if (counts.champagne + counts.all > 0) alcHtml += '<span class="badge">🥂 <b>Шампанское</b> · ~' + champL + " л</span>";
     if (counts.unknown > 0) alcHtml += '<span class="badge">🤷 <b>Не знаю</b> · ' + counts.unknown + " чел.</span>";
-
     var softHtml = "";
     if (softCounts.water + softCounts.all > 0) softHtml += '<span class="badge soft">💧 <b>Вода</b> · ~' + waterL + " л</span>";
     if (softCounts.juice + softCounts.all > 0) softHtml += '<span class="badge soft">🧃 <b>Сок</b> · ~' + juiceL + " л</span>";
@@ -602,25 +525,19 @@ tr:hover td{background:rgba(230,196,122,.06)}
     if (softCounts.lemonade > 0) softHtml += '<span class="badge soft">🍋 <b>Лимонад</b> · ' + softCounts.lemonade + " чел.</span>";
     if (softCounts.compote > 0) softHtml += '<span class="badge soft">🍑 <b>Компот</b> · ' + softCounts.compote + " чел.</span>";
     if (softCounts.unknown > 0) softHtml += '<span class="badge soft">🤷 <b>Не знаю</b> · ' + softCounts.unknown + " чел.</span>";
-
-    box.innerHTML = '<div class="res-sec"><div class="ttl">🍾 Алкоголь</div>' + (alcHtml || '<span class="badge">Пьющих нет</span>') + "</div>" +
-      '<div class="res-sec"><div class="ttl">🥤 Безалкогольные</div>' + (softHtml || '<span class="badge soft">Не указаны</span>') + "</div>" +
-      '<div class="hint">Нормы: крепкое 250 мл, вино 350 мл, шампанское 200 мл на пьющего. Вода 0,5 л, сок 0,3 л, газировка 0,2 л на человека.</div>';
+    box.innerHTML = '<div class="res-sec"><div class="ttl">🍾 Алкоголь</div>' + (alcHtml || '<span class="badge">Пьющих нет</span>') + "</div>" + '<div class="res-sec"><div class="ttl">🥤 Безалкогольные</div>' + (softHtml || '<span class="badge soft">Не указаны</span>') + "</div>" + '<div class="hint">Нормы: крепкое 250 мл, вино 350 мл, шампанское 200 мл на пьющего. Вода 0,5 л, сок 0,3 л, газировка 0,2 л на человека.</div>';
   }
 
-  function esc(s) {
-    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
-  }
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;"); }
 
   document.addEventListener("DOMContentLoaded", function() {
     loadFromUrl();
     refreshAll();
-
     $("btnAdd").addEventListener("click", addGuest);
     $("btnCreateGroup").addEventListener("click", createGroup);
     $("btnSeat").addEventListener("click", autoSeat);
     $("btnCalc").addEventListener("click", calc);
-    $("btnShare").addEventListener("click", generateShareLink);
+    $("btnSaveLink").addEventListener("click", generateLink);
     $("gName").addEventListener("keydown", function(e) { if (e.key === "Enter") addGuest(); });
   });
 })();
