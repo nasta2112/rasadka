@@ -124,11 +124,11 @@ tr:hover td{background:rgba(230,196,122,.06)}
     <div class="divider">❦</div>
   </header>
 
-  <!-- НОВАЯ ПАНЕЛЬ СОХРАНЕНИЯ -->
+  <!-- ПАНЕЛЬ СОХРАНЕНИЯ -->
   <div class="card" style="padding: 20px; text-align: center;">
-    <button type="button" id="btnSaveLink" class="btn-gold" style="max-width: 400px; margin: 0 auto; font-size: 16px;">💾 Сохранить и получить ссылку</button>
-    <div id="linkResult" class="hint" style="display:none; margin-top:15px; word-break:break-all; text-align:left;"></div>
-    <div class="hint" style="margin-top:10px;">Нажмите кнопку, скопируйте ссылку и отправьте другу. Вся рассадка сохранится в ссылке.</div>
+    <button type="button" id="btnSaveLink" class="btn-gold" style="max-width: 400px; margin: 0 auto; font-size: 16px; margin-bottom: 10px;">🔗 Скопировать ссылку с данными</button>
+    <div id="linkResult" class="hint" style="display:none; word-break:break-all; text-align:left; font-size:12px; color:var(--gold2);"></div>
+    <div class="hint" style="margin-top:10px;">Данные автоматически сохраняются в вашем браузере. Чтобы поделиться — нажмите кнопку и отправьте ссылку другу.</div>
   </div>
 
   <div class="card">
@@ -137,92 +137,30 @@ tr:hover td{background:rgba(230,196,122,.06)}
       <input id="gName" placeholder="Имя гостя">
       <select id="gRole">
         <option value="">— Кем является —</option>
-        <optgroup label="👨‍👩‍👧 Ближайшие">
-          <option>Мама</option><option>Папа</option><option>Отчим</option><option>Мачеха</option>
-          <option>Бабушка</option><option>Дедушка</option><option>Прабабушка</option><option>Прадедушка</option>
-        </optgroup>
-        <optgroup label="👫 Братья и сёстры">
-          <option>Брат</option><option>Сестра</option><option>Старший брат</option><option>Младший брат</option>
-          <option>Старшая сестра</option><option>Младшая сестра</option><option>Сводный брат</option><option>Сводная сестра</option>
-        </optgroup>
-        <optgroup label="👨‍👩‍👦 Дяди и тёти">
-          <option>Дядя (по маме)</option><option>Дядя (по папе)</option><option>Тётя (по маме)</option><option>Тётя (по папе)</option>
-          <option>Дядя</option><option>Тётя</option>
-        </optgroup>
-        <optgroup label="🧒 Двоюродные и троюродные">
-          <option>Двоюродный брат</option><option>Двоюродная сестра</option><option>Троюродный брат</option><option>Троюродная сестра</option>
-          <option>Двоюродный дядя</option><option>Двоюродная тётя</option><option>Двоюродная сестра мамы</option>
-          <option>Двоюродный брат мамы</option><option>Двоюродная сестра папы</option><option>Двоюродный брат папы</option>
-          <option>Двоюродная бабушка</option><option>Двоюродный дедушка</option>
-        </optgroup>
-        <optgroup label="👶 Племянники и внуки">
-          <option>Племянник</option><option>Племянница</option><option>Внук</option><option>Внучка</option>
-          <option>Двоюродный племянник</option><option>Двоюродная племянница</option>
-        </optgroup>
-        <optgroup label="💍 Сваты и родня">
-          <option>Сват</option><option>Сватья</option><option>Кум</option><option>Кума</option>
-          <option>Свекровь</option><option>Свёкор</option><option>Тёща</option><option>Тесть</option>
-          <option>Зять</option><option>Сноха (невестка)</option>
-          <option>Свояк</option><option>Свояченица</option><option>Шурин</option><option>Деверь</option><option>Золовка</option>
-        </optgroup>
-        <optgroup label="💑 Половинка">
-          <option>Муж</option><option>Жена</option><option>Парень (бойфренд)</option><option>Девушка (герлфренд)</option>
-        </optgroup>
-        <optgroup label="👶 Дети">
-          <option>Ребёнок</option><option>Сын</option><option>Дочь</option>
-        </optgroup>
-        <optgroup label="👥 Друзья">
-          <option>Друг</option><option>Лучший друг</option><option>Подруга</option><option>Лучшая подруга</option>
-          <option>Свидетель</option><option>Свидетельница</option><option>Друг семьи</option>
-          <option>Сосед</option><option>Соседка</option><option>Коллега</option><option>Начальник</option>
-          <option>Одноклассник</option><option>Одноклассница</option><option>Одногруппник</option><option>Одногруппница</option>
-        </optgroup>
-        <optgroup label="✨ Другое">
-          <option>Гость</option><option>Другое</option>
-        </optgroup>
+        <optgroup label="👨‍👩‍👧 Ближайшие"><option>Мама</option><option>Папа</option><option>Отчим</option><option>Мачеха</option><option>Бабушка</option><option>Дедушка</option><option>Прабабушка</option><option>Прадедушка</option></optgroup>
+        <optgroup label="👫 Братья и сёстры"><option>Брат</option><option>Сестра</option><option>Старший брат</option><option>Младший брат</option><option>Старшая сестра</option><option>Младшая сестра</option><option>Сводный брат</option><option>Сводная сестра</option></optgroup>
+        <optgroup label="👨‍👩‍👦 Дяди и тёти"><option>Дядя (по маме)</option><option>Дядя (по папе)</option><option>Тётя (по маме)</option><option>Тётя (по папе)</option><option>Дядя</option><option>Тётя</option></optgroup>
+        <optgroup label="🧒 Двоюродные и троюродные"><option>Двоюродный брат</option><option>Двоюродная сестра</option><option>Троюродный брат</option><option>Троюродная сестра</option><option>Двоюродный дядя</option><option>Двоюродная тётя</option><option>Двоюродная сестра мамы</option><option>Двоюродный брат мамы</option><option>Двоюродная сестра папы</option><option>Двоюродный брат папы</option><option>Двоюродная бабушка</option><option>Двоюродный дедушка</option></optgroup>
+        <optgroup label="👶 Племянники и внуки"><option>Племянник</option><option>Племянница</option><option>Внук</option><option>Внучка</option><option>Двоюродный племянник</option><option>Двоюродная племянница</option></optgroup>
+        <optgroup label="💍 Сваты и родня"><option>Сват</option><option>Сватья</option><option>Кум</option><option>Кума</option><option>Свекровь</option><option>Свёкор</option><option>Тёща</option><option>Тесть</option><option>Зять</option><option>Сноха (невестка)</option><option>Свояк</option><option>Свояченица</option><option>Шурин</option><option>Деверь</option><option>Золовка</option></optgroup>
+        <optgroup label="💑 Половинка"><option>Муж</option><option>Жена</option><option>Парень (бойфренд)</option><option>Девушка (герлфренд)</option></optgroup>
+        <optgroup label="👶 Дети"><option>Ребёнок</option><option>Сын</option><option>Дочь</option></optgroup>
+        <optgroup label="👥 Друзья"><option>Друг</option><option>Лучший друг</option><option>Подруга</option><option>Лучшая подруга</option><option>Свидетель</option><option>Свидетельница</option><option>Друг семьи</option><option>Сосед</option><option>Соседка</option><option>Коллега</option><option>Начальник</option><option>Одноклассник</option><option>Одноклассница</option><option>Одногруппник</option><option>Одногруппница</option></optgroup>
+        <optgroup label="✨ Другое"><option>Гость</option><option>Другое</option></optgroup>
       </select>
-      <select id="gSide">
-        <option value="bride">Сторона невесты</option>
-        <option value="groom">Сторона жениха</option>
-      </select>
-      <select id="gDrink">
-        <option value="all">🍷 Всё (любой алкоголь)</option>
-        <option value="unknown">🤷 Не знаю</option>
-        <option value="vodka">Крепкое</option>
-        <option value="wine">Вино</option>
-        <option value="champagne">Шампанское</option>
-        <option value="none">Не пьёт</option>
-      </select>
-      <select id="gSoft">
-        <option value="all">🥤 Всё (любой безалк.)</option>
-        <option value="unknown">🤷 Не знаю</option>
-        <option value="water">Вода</option>
-        <option value="juice">Сок</option>
-        <option value="soda">Газировка</option>
-        <option value="tea">Чай/кофе</option>
-        <option value="mors">Морс</option>
-        <option value="lemonade">Лимонад</option>
-        <option value="compote">Компот</option>
-      </select>
-      <select id="gCompany">
-        <option value="alone">👤 Придёт один</option>
-        <option value="pair">💑 С парой</option>
-        <option value="family">👨‍👩‍👧 Семьёй</option>
-        <option value="children">👶 С детьми</option>
-      </select>
+      <select id="gSide"><option value="bride">Сторона невесты</option><option value="groom">Сторона жениха</option></select>
+      <select id="gDrink"><option value="all">🍷 Всё (любой алкоголь)</option><option value="unknown">🤷 Не знаю</option><option value="vodka">Крепкое</option><option value="wine">Вино</option><option value="champagne">Шампанское</option><option value="none">Не пьёт</option></select>
+      <select id="gSoft"><option value="all">🥤 Всё (любой безалк.)</option><option value="unknown">🤷 Не знаю</option><option value="water">Вода</option><option value="juice">Сок</option><option value="soda">Газировка</option><option value="tea">Чай/кофе</option><option value="mors">Морс</option><option value="lemonade">Лимонад</option><option value="compote">Компот</option></select>
+      <select id="gCompany"><option value="alone">👤 Придёт один</option><option value="pair">💑 С парой</option><option value="family">👨‍👩‍👧 Семьёй</option><option value="children">👶 С детьми</option></select>
     </div>
     <button type="button" id="btnAdd" class="btn-gold">➕ Добавить гостя</button>
-    <div class="hint">Можно нажать <b>Enter</b> в поле имени.</div>
   </div>
 
   <div class="card">
     <h2><span class="icon">🤝</span> Посадить вместе (пары и семьи)</h2>
     <div class="grp-builder">
       <h3>Создать группу «сидят вместе»</h3>
-      <div class="grp-hint">Отметьте галочками <b>всех</b>, кто должен сидеть за одним столом. Например: Соня + Дима + их ребёнок.</div>
-      <div class="grp-selector" id="guestSelector">
-        <div class="grp-hint">Сначала добавьте гостей выше</div>
-      </div>
+      <div class="grp-selector" id="guestSelector"><div class="grp-hint">Сначала добавьте гостей выше</div></div>
       <div class="grp-actions">
         <input type="text" id="groupName" class="grp-name-input" placeholder="Название группы (например: Семья Ивановых)">
         <button type="button" id="btnCreateGroup" class="btn-link">💍 Создать группу</button>
@@ -236,9 +174,7 @@ tr:hover td{background:rgba(230,196,122,.06)}
     <div class="stats" id="stats"></div>
     <div class="tw">
       <table id="guestTable">
-        <thead>
-          <tr><th>Имя</th><th>Кем</th><th>Сторона</th><th>Алкоголь</th><th>Безалк.</th><th>Группа</th><th></th></tr>
-        </thead>
+        <thead><tr><th>Имя</th><th>Кем</th><th>Сторона</th><th>Алкоголь</th><th>Безалк.</th><th>Группа</th><th></th></tr></thead>
         <tbody></tbody>
       </table>
     </div>
@@ -247,9 +183,7 @@ tr:hover td{background:rgba(230,196,122,.06)}
 
   <div class="card">
     <h2><span class="icon">🏛️</span> План зала</h2>
-    <div class="hall" id="hall">
-      <div class="empty"><span class="big">🏛️</span>Добавьте гостей и нажмите «Распределить»</div>
-    </div>
+    <div class="hall" id="hall"><div class="empty"><span class="big">🏛️</span>Добавьте гостей и нажмите «Распределить»</div></div>
   </div>
 
   <div class="card">
@@ -268,30 +202,55 @@ tr:hover td{background:rgba(230,196,122,.06)}
   var drinkNames = { all: "Всё", unknown: "Не знаю", vodka: "Крепкое", wine: "Вино", champagne: "Шампанское", none: "Не пьёт" };
   var softNames = { all: "Всё", unknown: "Не знаю", water: "Вода", juice: "Сок", soda: "Газировка", tea: "Чай/кофе", mors: "Морс", lemonade: "Лимонад", compote: "Компот" };
   var sideNames = { bride: "Невесты", groom: "Жениха" };
-  var companyNames = { alone: "Один", pair: "С парой", family: "Семьёй", children: "С детьми" };
+  var companyNames = { alone: "Один", pair: "С парой", family: "С семьёй", children: "С детьми" };
 
   function $(id) { return document.getElementById(id); }
 
-  // --- ФУНКЦИЯ СОЗДАНИЯ ССЫЛКИ ---
+  // --- АВТОСОХРАНЕНИЕ В БРАУЗЕР ---
+  function saveToLocal() {
+    try {
+      localStorage.setItem('wedding_guests', JSON.stringify(guests));
+      localStorage.setItem('wedding_groups', JSON.stringify(groups));
+    } catch(e) {}
+  }
+
+  function loadFromLocal() {
+    try {
+      var g = localStorage.getItem('wedding_guests');
+      var gr = localStorage.getItem('wedding_groups');
+      if (g) guests = JSON.parse(g);
+      if (gr) groups = JSON.parse(gr);
+    } catch(e) {}
+  }
+
+  // --- СОЗДАНИЕ ССЫЛКИ ---
   function generateLink() {
     if (guests.length === 0) { alert("Сначала добавьте гостей!"); return; }
     
-    // Упаковываем данные в JSON и кодируем в Base64
-    var dataStr = JSON.stringify({ guests: guests, groups: groups });
+    // Упаковываем только нужные поля для максимальной компактности
+    var compactGuests = guests.map(function(g) {
+      return [g.name, g.role, g.side, g.drink, g.soft, g.company];
+    });
+    var compactGroups = groups.map(function(gr) {
+      return [gr.name, gr.members];
+    });
+    
+    var dataStr = JSON.stringify({ g: compactGuests, r: compactGroups });
     var encoded = btoa(encodeURIComponent(dataStr));
-    var url = window.location.origin + window.location.pathname + "?data=" + encoded;
+    var url = window.location.origin + window.location.pathname + "?d=" + encoded;
     
     var res = $("linkResult");
     res.style.display = "block";
-    res.innerHTML = '<b>Ваша ссылка готова!</b> Скопируйте её и отправьте другу. Он увидит всю вашу рассадку:<br><br>' +
-      '<input type="text" value="' + url + '" readonly style="width:100%; padding:10px; font-size:12px; background:#1a1216; color:#f5dda0; border:1px solid #e6c47a; border-radius:6px;" onclick="this.select()">';
+    res.innerHTML = '<b>Ссылка готова! Скопируйте её:</b><br><br>' +
+      '<input type="text" value="' + url + '" readonly style="width:100%; padding:10px; font-size:11px; background:#1a1216; color:#f5dda0; border:1px solid #e6c47a; border-radius:6px;" onclick="this.select()">' +
+      '<div style="margin-top:8px; font-size:11px; color:#b09a82;">Отправьте её другу — он увидит вашу рассадку.</div>';
     
-    // Пытаемся скопировать в буфер
+    // Копируем
     var temp = document.createElement('textarea');
     temp.value = url;
     document.body.appendChild(temp);
     temp.select();
-    try { document.execCommand('copy'); alert("Ссылка скопирована в буфер обмена!"); } 
+    try { document.execCommand('copy'); alert("Ссылка скопирована в буфер!"); } 
     catch(e) { alert("Выделите ссылку и нажмите Ctrl+C"); }
     document.body.removeChild(temp);
   }
@@ -299,19 +258,27 @@ tr:hover td{background:rgba(230,196,122,.06)}
   // --- ЗАГРУЗКА ИЗ ССЫЛКИ ---
   function loadFromUrl() {
     var urlParams = new URLSearchParams(window.location.search);
-    var dataParam = urlParams.get('data');
+    var dataParam = urlParams.get('d');
     if (dataParam) {
       try {
         var decoded = JSON.parse(decodeURIComponent(atob(dataParam)));
-        if (decoded.guests) {
-          guests = decoded.guests;
-          groups = decoded.groups || [];
+        if (decoded.g) {
+          guests = decoded.g.map(function(arr) {
+            return { name: arr[0], role: arr[1], side: arr[2], drink: arr[3], soft: arr[4], company: arr[5] };
+          });
+          groups = (decoded.r || []).map(function(arr) {
+            return { name: arr[0], members: arr[1] };
+          });
           refreshAll();
+          saveToLocal();
         }
       } catch(e) { 
         console.error("Ошибка загрузки данных из ссылки", e); 
-        alert("Не удалось загрузить данные из ссылки. Возможно, она повреждена.");
+        alert("Не удалось загрузить данные из ссылки.");
       }
+    } else {
+      loadFromLocal();
+      refreshAll();
     }
   }
 
@@ -324,6 +291,7 @@ tr:hover td{background:rgba(230,196,122,.06)}
     });
     $("gName").value = "";
     $("gName").focus();
+    saveToLocal();
     refreshAll();
   }
 
@@ -335,6 +303,7 @@ tr:hover td{background:rgba(230,196,122,.06)}
       if (groups[gi].members.length < 2) groups.splice(gi, 1);
     }
     delete selectedForGroup[name];
+    saveToLocal();
     refreshAll();
   }
 
@@ -359,10 +328,11 @@ tr:hover td{background:rgba(230,196,122,.06)}
     groups.push({ name: groupName, members: members });
     selectedForGroup = {};
     $("groupName").value = "";
+    saveToLocal();
     refreshAll();
   }
 
-  function removeGroup(i) { groups.splice(i, 1); refreshAll(); }
+  function removeGroup(i) { groups.splice(i, 1); saveToLocal(); refreshAll(); }
 
   function getGroupForGuest(name) {
     for (var i = 0; i < groups.length; i++) if (groups[i].members.indexOf(name) !== -1) return groups[i];
@@ -532,7 +502,6 @@ tr:hover td{background:rgba(230,196,122,.06)}
 
   document.addEventListener("DOMContentLoaded", function() {
     loadFromUrl();
-    refreshAll();
     $("btnAdd").addEventListener("click", addGuest);
     $("btnCreateGroup").addEventListener("click", createGroup);
     $("btnSeat").addEventListener("click", autoSeat);
