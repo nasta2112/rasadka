@@ -111,6 +111,46 @@ tr:hover td{background:rgba(230,196,122,.06)}
 @media(max-width:700px){.hall-grid{grid-template-columns:repeat(2,1fr);gap:45px 20px}.couple{padding:22px 40px}}
 @media(max-width:600px){.card{padding:24px 18px}h1{font-size:38px}header{padding:45px 10px 25px}.rtable .list{opacity:1;position:static;transform:none;margin-top:12px;background:transparent;box-shadow:none;border:none;padding:0}}
 </style>
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+  // ВАША ССЫЛКА НА БАЗУ ДАННЫХ УЖЕ ВСТАВЛЕНА
+  const firebaseConfig = {
+    databaseURL: "https://svadba-c15cb-default-rtdb.firebaseio.com"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const dbRef = ref(db, 'wedding');
+
+  // Сохранение в облако
+  window.saveToCloud = function(data) {
+    set(dbRef, data).then(() => {
+      document.getElementById('saveStatus').innerText = "✅ Сохранено в облако!";
+      document.getElementById('saveStatus').style.display = "block";
+      setTimeout(() => { document.getElementById('saveStatus').style.display = "none"; }, 3000);
+    }).catch((error) => {
+      document.getElementById('saveStatus').innerText = "❌ Ошибка сохранения. Проверьте интернет.";
+      document.getElementById('saveStatus').style.display = "block";
+    });
+  };
+
+  // Загрузка из облака
+  window.loadFromCloud = function(callback) {
+    get(dbRef).then((snapshot) => {
+      if (snapshot.exists()) {
+        callback(snapshot.val());
+      } else {
+        callback(null);
+      }
+    }).catch((error) => {
+      console.error("Ошибка загрузки", error);
+      callback(null);
+    });
+  };
+</script>
 </head>
 <body>
 
@@ -126,9 +166,9 @@ tr:hover td{background:rgba(230,196,122,.06)}
 
   <!-- ПАНЕЛЬ СОХРАНЕНИЯ -->
   <div class="card" style="padding: 20px; text-align: center;">
-    <button type="button" id="btnSaveLink" class="btn-gold" style="max-width: 400px; margin: 0 auto; font-size: 16px; margin-bottom: 10px;">🔗 Скопировать ссылку с данными</button>
-    <div id="linkResult" class="hint" style="display:none; word-break:break-all; text-align:left; font-size:12px; color:var(--gold2);"></div>
-    <div class="hint" style="margin-top:10px;">Данные автоматически сохраняются в вашем браузере. Чтобы поделиться — нажмите кнопку и отправьте ссылку другу.</div>
+    <button type="button" id="btnSaveCloud" class="btn-gold" style="max-width: 400px; margin: 0 auto; font-size: 16px;">💾 Сохранить в облако</button>
+    <div id="saveStatus" style="display:none; margin-top:15px; font-weight:bold; color:var(--gold2);"></div>
+    <div class="hint" style="margin-top:10px;">Данные сохраняются на сервере. Ссылка на сайт всегда одна и та же — просто отправьте её другу, он увидит вашу рассадку.</div>
   </div>
 
   <div class="card">
@@ -151,7 +191,7 @@ tr:hover td{background:rgba(230,196,122,.06)}
       <select id="gSide"><option value="bride">Сторона невесты</option><option value="groom">Сторона жениха</option></select>
       <select id="gDrink"><option value="all">🍷 Всё (любой алкоголь)</option><option value="unknown">🤷 Не знаю</option><option value="vodka">Крепкое</option><option value="wine">Вино</option><option value="champagne">Шампанское</option><option value="none">Не пьёт</option></select>
       <select id="gSoft"><option value="all">🥤 Всё (любой безалк.)</option><option value="unknown">🤷 Не знаю</option><option value="water">Вода</option><option value="juice">Сок</option><option value="soda">Газировка</option><option value="tea">Чай/кофе</option><option value="mors">Морс</option><option value="lemonade">Лимонад</option><option value="compote">Компот</option></select>
-      <select id="gCompany"><option value="alone">👤 Придёт один</option><option value="pair">💑 С парой</option><option value="family">👨‍👩‍👧 Семьёй</option><option value="children">👶 С детьми</option></select>
+      <select id="gCompany"><option value="alone">👤 Придёт один</option><option value="pair">💑 С парой</option><option value="family">👨‍👩‍👧 С семьёй</option><option value="children">👶 С детьми</option></select>
     </div>
     <button type="button" id="btnAdd" class="btn-gold">➕ Добавить гостя</button>
   </div>
@@ -206,79 +246,9 @@ tr:hover td{background:rgba(230,196,122,.06)}
 
   function $(id) { return document.getElementById(id); }
 
-  // --- АВТОСОХРАНЕНИЕ В БРАУЗЕР ---
-  function saveToLocal() {
-    try {
-      localStorage.setItem('wedding_guests', JSON.stringify(guests));
-      localStorage.setItem('wedding_groups', JSON.stringify(groups));
-    } catch(e) {}
-  }
-
-  function loadFromLocal() {
-    try {
-      var g = localStorage.getItem('wedding_guests');
-      var gr = localStorage.getItem('wedding_groups');
-      if (g) guests = JSON.parse(g);
-      if (gr) groups = JSON.parse(gr);
-    } catch(e) {}
-  }
-
-  // --- СОЗДАНИЕ ССЫЛКИ ---
-  function generateLink() {
-    if (guests.length === 0) { alert("Сначала добавьте гостей!"); return; }
-    
-    // Упаковываем только нужные поля для максимальной компактности
-    var compactGuests = guests.map(function(g) {
-      return [g.name, g.role, g.side, g.drink, g.soft, g.company];
-    });
-    var compactGroups = groups.map(function(gr) {
-      return [gr.name, gr.members];
-    });
-    
-    var dataStr = JSON.stringify({ g: compactGuests, r: compactGroups });
-    var encoded = btoa(encodeURIComponent(dataStr));
-    var url = window.location.origin + window.location.pathname + "?d=" + encoded;
-    
-    var res = $("linkResult");
-    res.style.display = "block";
-    res.innerHTML = '<b>Ссылка готова! Скопируйте её:</b><br><br>' +
-      '<input type="text" value="' + url + '" readonly style="width:100%; padding:10px; font-size:11px; background:#1a1216; color:#f5dda0; border:1px solid #e6c47a; border-radius:6px;" onclick="this.select()">' +
-      '<div style="margin-top:8px; font-size:11px; color:#b09a82;">Отправьте её другу — он увидит вашу рассадку.</div>';
-    
-    // Копируем
-    var temp = document.createElement('textarea');
-    temp.value = url;
-    document.body.appendChild(temp);
-    temp.select();
-    try { document.execCommand('copy'); alert("Ссылка скопирована в буфер!"); } 
-    catch(e) { alert("Выделите ссылку и нажмите Ctrl+C"); }
-    document.body.removeChild(temp);
-  }
-
-  // --- ЗАГРУЗКА ИЗ ССЫЛКИ ---
-  function loadFromUrl() {
-    var urlParams = new URLSearchParams(window.location.search);
-    var dataParam = urlParams.get('d');
-    if (dataParam) {
-      try {
-        var decoded = JSON.parse(decodeURIComponent(atob(dataParam)));
-        if (decoded.g) {
-          guests = decoded.g.map(function(arr) {
-            return { name: arr[0], role: arr[1], side: arr[2], drink: arr[3], soft: arr[4], company: arr[5] };
-          });
-          groups = (decoded.r || []).map(function(arr) {
-            return { name: arr[0], members: arr[1] };
-          });
-          refreshAll();
-          saveToLocal();
-        }
-      } catch(e) { 
-        console.error("Ошибка загрузки данных из ссылки", e); 
-        alert("Не удалось загрузить данные из ссылки.");
-      }
-    } else {
-      loadFromLocal();
-      refreshAll();
+  function saveData() {
+    if (window.saveToCloud) {
+      window.saveToCloud({ guests: guests, groups: groups });
     }
   }
 
@@ -291,7 +261,7 @@ tr:hover td{background:rgba(230,196,122,.06)}
     });
     $("gName").value = "";
     $("gName").focus();
-    saveToLocal();
+    saveData();
     refreshAll();
   }
 
@@ -303,7 +273,7 @@ tr:hover td{background:rgba(230,196,122,.06)}
       if (groups[gi].members.length < 2) groups.splice(gi, 1);
     }
     delete selectedForGroup[name];
-    saveToLocal();
+    saveData();
     refreshAll();
   }
 
@@ -328,11 +298,11 @@ tr:hover td{background:rgba(230,196,122,.06)}
     groups.push({ name: groupName, members: members });
     selectedForGroup = {};
     $("groupName").value = "";
-    saveToLocal();
+    saveData();
     refreshAll();
   }
 
-  function removeGroup(i) { groups.splice(i, 1); saveToLocal(); refreshAll(); }
+  function removeGroup(i) { groups.splice(i, 1); saveData(); refreshAll(); }
 
   function getGroupForGuest(name) {
     for (var i = 0; i < groups.length; i++) if (groups[i].members.indexOf(name) !== -1) return groups[i];
@@ -501,12 +471,23 @@ tr:hover td{background:rgba(230,196,122,.06)}
   function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;"); }
 
   document.addEventListener("DOMContentLoaded", function() {
-    loadFromUrl();
+    if (window.loadFromCloud) {
+      window.loadFromCloud(function(data) {
+        if (data) {
+          guests = data.guests || [];
+          groups = data.groups || [];
+        }
+        refreshAll();
+      });
+    } else {
+      refreshAll();
+    }
+
     $("btnAdd").addEventListener("click", addGuest);
     $("btnCreateGroup").addEventListener("click", createGroup);
     $("btnSeat").addEventListener("click", autoSeat);
     $("btnCalc").addEventListener("click", calc);
-    $("btnSaveLink").addEventListener("click", generateLink);
+    $("btnSaveCloud").addEventListener("click", function() { saveData(); });
     $("gName").addEventListener("keydown", function(e) { if (e.key === "Enter") addGuest(); });
   });
 })();
